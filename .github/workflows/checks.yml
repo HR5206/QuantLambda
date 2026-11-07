@@ -1,0 +1,23 @@
+name: Checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Compile and run on the runner's JDK 21
+        run: |
+          export PATH="$JAVA_HOME_21_X64/bin:$PATH"
+          java -version
+          mkdir -p out
+          find src tests -name '*.java' > sources.txt
+          javac -d out @sources.txt
+          java -cp out lexer.LexerTest
+          java -cp out parser.ParserTest
+          java -cp out semantic.SemanticTest
+          java -cp out vm.VMTest
+          java -cp out vm.RegressionTest
+          java -cp out backtest.Main
