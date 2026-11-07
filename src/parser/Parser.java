@@ -60,6 +60,7 @@ public class Parser {
 
     public Program parseProgram() {
         Strategy strategy = parseStrategy();
+        if (!isAtEnd()) throw new RuntimeException("Unexpected input after strategy");
         return new Program(strategy);
     }
 

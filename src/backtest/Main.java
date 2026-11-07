@@ -32,7 +32,7 @@ public class Main {
         long start1 = System.nanoTime();
         engine1.run();
         long end1 = System.nanoTime();
-        System.out.println("VM Execution Time: " + (end1 - start1) / 1_000_000.0 + " ms");
+        System.out.println("Replay wall time (includes output): " + (end1 - start1) / 1_000_000.0 + " ms");
         System.out.println("======================================\n");
 
         System.out.println("======================================");
@@ -41,7 +41,7 @@ public class Main {
         long start2 = System.nanoTime();
         engine2.run();
         long end2 = System.nanoTime();
-        System.out.println("VM Execution Time: " + (end2 - start2) / 1_000_000.0 + " ms");
+        System.out.println("Replay wall time (includes output): " + (end2 - start2) / 1_000_000.0 + " ms");
         System.out.println("======================================");
     }
 }

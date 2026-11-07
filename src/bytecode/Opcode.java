@@ -1,6 +1,7 @@
 package bytecode;
 
 public enum Opcode {
+    POP,
     LOAD_CONST,
     LOAD_VAR,
     STORE_VAR,
