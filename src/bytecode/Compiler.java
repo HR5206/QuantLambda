@@ -77,6 +77,7 @@ public class Compiler implements Visitor<Void> {
     @Override
     public Void visitExpressionStatement(ExpressionStatement node) {
         node.expression.accept(this);
+        chunk.write(Opcode.POP);
         return null;
     }
 
@@ -118,6 +119,19 @@ public class Compiler implements Visitor<Void> {
     @Override
     public Void visitBinaryExpression(BinaryExpression node) {
         node.left.accept(this);
+        if (node.operator.equals("&&") || node.operator.equals("||")) {
+            int branch = chunk.getCount();
+            chunk.write(Opcode.JUMP_IF_FALSE, -1);
+            if (node.operator.equals("&&")) node.right.accept(this);
+            else chunk.write(Opcode.LOAD_CONST, chunk.addConstant(true));
+            int end = chunk.getCount();
+            chunk.write(Opcode.JUMP, -1);
+            chunk.patchOperand(branch, chunk.getCount());
+            if (node.operator.equals("&&")) chunk.write(Opcode.LOAD_CONST, chunk.addConstant(false));
+            else node.right.accept(this);
+            chunk.patchOperand(end, chunk.getCount());
+            return null;
+        }
         node.right.accept(this);
         switch (node.operator) {
             case "+": chunk.write(Opcode.ADD); break;
@@ -138,11 +152,7 @@ public class Compiler implements Visitor<Void> {
 
     @Override
     public Void visitCallExpression(CallExpression node) {
-        for (Expression arg : node.arguments) {
-            arg.accept(this);
-        }
-        chunk.write(Opcode.CALL, new Object[]{node.callee, node.arguments.size()});
-        return null;
+        throw new UnsupportedOperationException("Function calls are not implemented: " + node.callee);
     }
 
     @Override

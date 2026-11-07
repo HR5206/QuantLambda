@@ -12,10 +12,14 @@ public class SymbolTable {
     }
 
     public void define(String name, String type) {
-        if (symbols.containsKey(name)) {
+        if (contains(name)) {
             throw new RuntimeException("Variable '" + name + "' already defined in this scope.");
         }
         symbols.put(name, type);
+    }
+
+    private boolean contains(String name) {
+        return symbols.containsKey(name) || (parent != null && parent.contains(name));
     }
 
     public String resolve(String name) {

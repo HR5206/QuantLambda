@@ -32,6 +32,7 @@ public class VirtualMachine {
             ip++;
 
             switch (instruction) {
+                case POP: stack.pop(); break;
                 case LOAD_CONST:
                     stack.push(chunk.constants.get((Integer) operand));
                     break;
@@ -62,6 +63,7 @@ public class VirtualMachine {
                 case DIV: {
                     double b = popDouble();
                     double a = popDouble();
+                    if (b == 0) throw new ArithmeticException("Division by zero");
                     stack.push(a / b);
                     break;
                 }
@@ -96,13 +98,13 @@ public class VirtualMachine {
                 case EQUAL: {
                     Object b = stack.pop();
                     Object a = stack.pop();
-                    stack.push(a.equals(b));
+                    stack.push(equalValues(a, b));
                     break;
                 }
                 case NOT_EQUAL: {
                     Object b = stack.pop();
                     Object a = stack.pop();
-                    stack.push(!a.equals(b));
+                    stack.push(!equalValues(a, b));
                     break;
                 }
                 case NOT: {
@@ -136,16 +138,14 @@ public class VirtualMachine {
                 case CALL: {
                     Object[] op = (Object[]) operand;
                     String callee = (String) op[0];
-                    // Very simple dummy call for now
-                    stack.push(0.0);
-                    break;
+                    throw new UnsupportedOperationException("Function calls are not implemented: " + callee);
                 }
                 case BUY: {
-                    position += popDouble();
+                    position += quantity();
                     break;
                 }
                 case SELL: {
-                    position -= popDouble();
+                    position -= quantity();
                     break;
                 }
                 case HALT: {
@@ -156,6 +156,18 @@ public class VirtualMachine {
                 }
             }
         }
+    }
+
+    private boolean equalValues(Object a, Object b) {
+        if (a instanceof Number && b instanceof Number)
+            return ((Number)a).doubleValue() == ((Number)b).doubleValue();
+        return java.util.Objects.equals(a, b);
+    }
+
+    private double quantity() {
+        double value = popDouble();
+        if (!Double.isFinite(value) || value < 0) throw new IllegalArgumentException("Quantity must be finite and nonnegative");
+        return value;
     }
 
     private double popDouble() {

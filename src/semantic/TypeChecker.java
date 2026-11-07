@@ -8,8 +8,6 @@ public class TypeChecker implements Visitor<String> {
     public TypeChecker() {
         this.currentScope = new SymbolTable(null);
         // Built-ins
-        this.currentScope.define("sma", "Series<Price>"); 
-        this.currentScope.define("ema", "Series<Price>");
         this.currentScope.define("sma_10", "double");
     }
 
@@ -73,6 +71,8 @@ public class TypeChecker implements Visitor<String> {
     public String visitVariableDeclaration(VariableDeclaration node) {
         String exprType = node.initializer.accept(this);
         String declaredType = node.type;
+        if ("Quantity".equals(declaredType) || "Series<Price>".equals(declaredType))
+            throw new RuntimeException("This annotation is reserved but not implemented: " + declaredType);
         
         if (declaredType == null) {
             declaredType = exprType; // Simple type inference
@@ -175,7 +175,7 @@ public class TypeChecker implements Visitor<String> {
                     if (left.equals("double") || right.equals("double") || left.equals("Price") || right.equals("Price")) {
                         return "double";
                     }
-                    return "int";
+                    return node.operator.equals("/") ? "double" : "int";
                 }
                 throw new RuntimeException("Arithmetic operations require numeric types.");
             case ">": case "<": case ">=": case "<=":
@@ -197,11 +197,7 @@ public class TypeChecker implements Visitor<String> {
 
     @Override
     public String visitCallExpression(CallExpression node) {
-        // Built-ins: sma(series, period)
-        if (node.callee.equals("sma") || node.callee.equals("ema")) {
-            return "double";
-        }
-        return "unknown";
+        throw new RuntimeException("Function calls are not implemented: " + node.callee);
     }
 
     @Override
