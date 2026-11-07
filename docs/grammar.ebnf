@@ -1,3 +1,4 @@
+(* Syntax reference: calls, Quantity and Series<Price> are reserved and rejected by semantic checking. See language-spec.md for supported execution. *)
 Program ::= StrategyDeclaration
 
 StrategyDeclaration ::= "strategy" Identifier "{" "on" "tick" "(" Identifier ")" BlockStatement "}"
